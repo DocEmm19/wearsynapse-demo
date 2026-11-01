@@ -273,14 +273,32 @@ function answer(i, o, b) {
   setTimeout(() => { $('check').style.display = 'none'; $('film').classList.add('show'); v.currentTime = 0; v.play().catch(() => {}); }, 900);
 }
 // Start fetching the locked film right away so unlocking feels instant
-const locked = fetch('demo.bin').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); });
+// Streamed so we can show progress if they type the password before it finishes
+let pct = 0;
+const locked = (async () => {
+  const r = await fetch('demo.bin'); if (!r.ok) throw new Error('fetch');
+  const total = +r.headers.get('content-length') || 8000000, reader = r.body.getReader(), parts = [];
+  let got = 0;
+  for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got += value.length; pct = Math.min(99, Math.round(got / total * 100)); }
+  pct = 100; return new Blob(parts).arrayBuffer();
+})();
+locked.catch(() => {});
 
 $('f').onsubmit = async e => {
   e.preventDefault();
   const btn = $('go'), msg = $('msg');
-  btn.disabled = true; btn.classList.add('busy'); msg.className = 'msg'; msg.textContent = 'Unlocking…';
+  btn.disabled = true; btn.classList.add('busy'); msg.className = 'msg';
+  const show = () => { msg.textContent = pct < 100 ? `Loading the film… ${pct}%` : 'Unlocking…'; };
+  show(); const timer = setInterval(show, 200);
+  let blob;
+  try { blob = new Uint8Array(await locked); }
+  catch {
+    clearInterval(timer); msg.className = 'msg err';
+    msg.textContent = 'The film couldn’t load. Please check your connection and refresh.';
+    btn.disabled = false; btn.classList.remove('busy'); return;
+  }
+  clearInterval(timer); msg.textContent = 'Unlocking…';
   try {
-    const blob = new Uint8Array(await locked);
     const base = await crypto.subtle.importKey('raw', new TextEncoder().encode($('pw').value), 'PBKDF2', false, ['deriveKey']);
     const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: blob.slice(0, 16), iterations: 600000, hash: 'SHA-256' },
       base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
