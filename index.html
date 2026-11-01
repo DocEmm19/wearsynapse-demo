@@ -5,88 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>WearSynapse Demo</title>
-<meta name="description" content="A two-minute product film for the Y Combinator W27 partners, made by a doctor in a terminal.">
-<meta property="og:title" content="WearSynapse — a note for the YC partners">
-<meta property="og:description" content="A two-minute product film, made by a doctor in a terminal. Password in our application.">
+<meta property="og:title" content="Hi YC">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Caveat:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f7f4ee;
-    --card: #fffdf9;
-    --ink: #1b1b1d;
-    --muted: #6d6a65;
-    --line: #e4dfd5;
-    --brand: #2747d6;
-    --yc: #ff6600;
-    --ok: #1f8a5b;
+    --paper: #f7f4ee; --card: #fffdf9; --ink: #1b1b1d; --muted: #6d6a65; --line: #e4dfd5;
+    --brand: #2747d6; --yc: #ff6600; --ok: #1f8a5b; --err: #b4361b;
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
-  body {
-    min-height: 100vh; min-height: 100dvh;
-    background: var(--paper); color: var(--ink);
-    font: 16px/1.6 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    display: flex; flex-direction: column;
-    overflow-x: hidden;
-  }
+  body { min-height: 100vh; min-height: 100dvh; background: var(--paper); color: var(--ink);
+         font: 16px/1.5 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; overflow-x: hidden; }
 
-  /* ECG strip across the top: the page's heartbeat */
-  .ecg { position: relative; height: 92px; overflow: hidden;
+  /* Heartbeat strip */
+  .ecg { height: 92px; overflow: hidden; position: relative;
          mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
          -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-  .ecg svg { position: absolute; top: 0; left: 0; height: 92px; width: 2400px;
-             animation: sweep 6s linear infinite; }
-  .ecg path { fill: none; stroke: var(--yc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+  .ecg svg { position: absolute; left: 0; top: 0; width: 2400px; height: 92px; animation: sweep 6s linear infinite; }
+  .ecg path { fill: none; stroke: var(--yc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke 400ms ease; }
   body.unlocked .ecg svg { animation-duration: 2.4s; }
   body.unlocked .ecg path { stroke: var(--ok); }
   @keyframes sweep { to { transform: translateX(-1200px); } }
 
-  main { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 8px 16px 40px; }
-  .sheet { width: 100%; max-width: 640px; }
+  main { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 0 16px 120px; }
+  .step { display: none; width: 100%; }
+  .step.show { display: block; animation: rise 500ms var(--ease-out) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  .shake { animation: shake 320ms var(--ease-out); }
+  @keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
 
-  /* Staggered entrance, once */
-  .in { opacity: 0; transform: translateY(8px); animation: rise 600ms var(--ease-out) forwards; }
-  .in:nth-child(1) { animation-delay: 80ms; }  .in:nth-child(2) { animation-delay: 140ms; }
-  .in:nth-child(3) { animation-delay: 200ms; } .in:nth-child(4) { animation-delay: 260ms; }
-  .in:nth-child(5) { animation-delay: 320ms; } .in:nth-child(6) { animation-delay: 380ms; }
-  .in:nth-child(7) { animation-delay: 440ms; }
-  @keyframes rise { to { opacity: 1; transform: none; } }
-
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500;
-             letter-spacing: .02em; color: var(--muted); margin-bottom: 18px; }
-  .eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: var(--yc);
-               box-shadow: 0 0 0 0 rgba(255,102,0,.5); animation: beat 1.2s var(--ease-out) infinite; }
-  @keyframes beat { 0%,60% { box-shadow: 0 0 0 0 rgba(255,102,0,.45); } 100% { box-shadow: 0 0 0 8px rgba(255,102,0,0); } }
-
-  h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: clamp(42px, 8vw, 64px);
-       line-height: 1.02; letter-spacing: -.01em; margin: 0 0 22px; text-wrap: balance; }
+  /* 1. Password */
+  #gate { max-width: 400px; text-align: center; }
+  h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: clamp(64px, 14vw, 96px);
+       line-height: 1; letter-spacing: -.01em; margin: 0 0 28px; }
   h1 em { color: var(--brand); }
-
-  .letter p { margin: 0 0 14px; color: #3a3936; max-width: 56ch; }
-  .letter strong { color: var(--ink); font-weight: 600; }
-  .creds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line);
-           border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 6px 0 16px; }
-  .creds div { background: var(--card); padding: 12px 14px; }
-  .creds b { display: block; font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 26px; line-height: 1.1; color: var(--brand); }
-  .creds span { display: block; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
-  @media (max-width: 520px) { .creds { grid-template-columns: 1fr; } .creds div { display: flex; align-items: baseline; gap: 10px; } }
-  .made { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 26px; padding: 0; list-style: none; }
-  .made li { font-size: 13px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--card); }
-  .made li s { text-decoration-color: var(--yc); text-decoration-thickness: 1.5px; }
-
-  /* The prescription */
-  .rx { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px 22px 20px;
-        box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 12px 32px -18px rgba(40,30,10,.25); position: relative; }
-  .rx-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
-  .rx-sym { font-family: "Instrument Serif", Georgia, serif; font-size: 44px; line-height: 1; color: var(--brand); }
-  .rx-line { font-size: 15px; }
-  .rx-line b { font-weight: 600; }
-  .rx-note { font-size: 13px; color: var(--muted); margin: 2px 0 16px 58px; }
   form { display: flex; gap: 8px; }
   input { flex: 1; min-width: 0; font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
           background: #fff; color: var(--ink); outline: none; transition: border-color 160ms ease, box-shadow 160ms ease; }
@@ -95,185 +51,87 @@
            cursor: pointer; white-space: nowrap; transition: transform 160ms var(--ease-out), background 160ms ease; }
   button:active { transform: scale(0.97); }
   @media (hover: hover) and (pointer: fine) { button:hover { background: #000; } }
-  button:disabled { cursor: default; }
-  button span { display: inline-block; transition: filter 200ms ease, opacity 200ms ease; }
-  button.busy span { filter: blur(2px); opacity: .6; }
-  .msg { min-height: 22px; font-size: 13px; color: var(--muted); margin-top: 10px; }
-  .msg:empty { min-height: 0; margin: 0; }
-  .msg.err { color: #b4361b; }
-  .shake { animation: shake 320ms var(--ease-out); }
-  @keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+  .msg { min-height: 22px; margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .msg.err { color: var(--err); }
 
-  .sign { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 26px; flex-wrap: wrap; }
-  .sig { font-family: Caveat, cursive; font-size: 30px; line-height: 1; color: var(--brand); transform: rotate(-3deg); }
-  .sig small { display: block; font-family: Inter, sans-serif; font-size: 12px; color: var(--muted); transform: rotate(3deg); margin-top: 8px; }
-  .aside { font-size: 13px; color: var(--muted); font-style: italic; max-width: 30ch; text-align: right; }
-
-  /* Gate -> film */
-  #gate { transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out), filter 360ms var(--ease-out); }
-  #gate.leave { opacity: 0; transform: scale(.98); filter: blur(6px); }
-  /* Human check: two questions between the password and the film */
-  #check { display: none; width: 100%; max-width: 460px; }
-  #check.show { display: block; animation: rise 500ms var(--ease-out) forwards; opacity: 0; transform: translateY(8px); }
-  .cap-box { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
-             box-shadow: 0 12px 32px -18px rgba(40,30,10,.25); }
-  .cap-top { background: var(--brand); color: #fff; padding: 18px 20px; }
-  .cap-top small { display: block; font-size: 12px; opacity: .8; letter-spacing: .02em; }
-  .cap-top b { display: block; font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 28px; line-height: 1.15; margin-top: 2px; }
-  .cap-body { padding: 14px; display: grid; gap: 8px; }
-  .opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px;
+  /* 2. Captcha */
+  #check { max-width: 440px; }
+  .box { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+         box-shadow: 0 12px 32px -18px rgba(40,30,10,.25); }
+  .top { background: var(--brand); color: #fff; padding: 18px 20px; }
+  .top small { display: block; font-size: 12px; opacity: .8; }
+  .top b { display: block; font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.15; }
+  .opts { padding: 14px; display: grid; gap: 8px; }
+  .opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 14px; border-radius: 10px;
          border: 1px solid var(--line); background: #fff; color: var(--ink); font-weight: 400; }
   @media (hover: hover) and (pointer: fine) { .opt:hover { background: #fff; border-color: var(--brand); } }
-  .opt .box { flex: none; width: 22px; height: 22px; border: 2px solid #b9b4aa; border-radius: 4px; display: grid; place-items: center;
-              transition: background 160ms ease, border-color 160ms ease; }
-  .opt .box svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 3; fill: none; stroke-dasharray: 20; stroke-dashoffset: 20;
-                  transition: stroke-dashoffset 260ms var(--ease-out) 60ms; }
-  .opt.right { border-color: var(--ok); }
-  .opt.right .box { background: var(--ok); border-color: var(--ok); }
-  .opt.right .box svg { stroke-dashoffset: 0; }
+  .tickbox { flex: none; width: 22px; height: 22px; border: 2px solid #b9b4aa; border-radius: 4px; display: grid; place-items: center;
+             transition: background 160ms ease, border-color 160ms ease; }
+  .tickbox svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 3; fill: none; stroke-dasharray: 20; stroke-dashoffset: 20;
+                 transition: stroke-dashoffset 260ms var(--ease-out) 60ms; }
+  .opt.right { border-color: var(--ok); } .opt.right .tickbox { background: var(--ok); border-color: var(--ok); }
+  .opt.right .tickbox svg { stroke-dashoffset: 0; }
   .opt.wrong { border-color: #d8a291; }
-  .opt .who { display: block; font-weight: 500; }
-  .opt .role { display: block; font-size: 13px; color: var(--muted); }
-  .cap-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 16px 14px;
-              font-size: 12px; color: var(--muted); }
-  .dots { display: flex; gap: 6px; } .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); transition: background 200ms ease; }
-  .dots i.on { background: var(--brand); }
-  .reply { min-height: 0; font-size: 14px; color: var(--muted); padding: 0 16px; }
-  .reply:not(:empty) { padding-bottom: 4px; }
-  .reply.err { color: #b4361b; } .reply.ok { color: var(--ok); }
+  .fact { display: none; margin: 0 14px 14px; padding: 16px; border-radius: 10px; background: #eef1fc; }
+  .fact.show { display: block; animation: rise 400ms var(--ease-out) both; }
+  .fact p { margin: 0 0 12px; font-family: "Instrument Serif", Georgia, serif; font-size: 24px; line-height: 1.2; }
+  .fact p b { font-weight: 400; color: var(--brand); }
+  .fact button { width: 100%; }
+  .nope { min-height: 0; margin: -4px 16px 12px; font-size: 14px; color: var(--err); }
+  .nope:empty { margin: 0; }
 
-  #film { display: none; width: 100%; max-width: 1040px; }
-  #film.show { display: block; animation: rise 600ms var(--ease-out) forwards; opacity: 0; transform: translateY(8px); }
-  .frame { border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 24px 60px -24px rgba(20,15,5,.45); }
-  video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; }
-  .cap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 14px; font-size: 14px; color: var(--muted); }
-  .cap em { font-family: "Instrument Serif", Georgia, serif; font-size: 20px; color: var(--ink); }
+  /* 3. Film */
+  #film { max-width: 1040px; }
+  #film video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; background: #000;
+                box-shadow: 0 24px 60px -24px rgba(20,15,5,.45); }
 
-  footer { text-align: center; font-size: 12px; color: var(--muted); padding: 0 16px 22px; }
-  footer a { color: inherit; }
-
-  @media (max-width: 520px) {
-    form { flex-direction: column; }
-    .rx-note { margin-left: 0; }
-    .aside { text-align: left; }
-  }
+  @media (max-width: 480px) { form { flex-direction: column; } }
   @media (prefers-reduced-motion: reduce) {
-    .ecg svg, .eyebrow i { animation: none; }
-    .in, #film.show { animation: fade 200ms ease forwards; transform: none; }
-    @keyframes fade { to { opacity: 1; } }
-    #gate { transition: opacity 200ms ease; } #gate.leave { transform: none; filter: none; }
+    .ecg svg { animation: none; }
+    .step.show, .fact.show { animation: fade 200ms ease both; }
+    @keyframes fade { from { opacity: 0; } }
     .shake { animation: none; }
   }
 </style>
 </head>
 <body>
-<div class="ecg" aria-hidden="true">
-  <svg viewBox="0 0 2400 92" preserveAspectRatio="none"><path id="trace"/></svg>
-</div>
+<div class="ecg" aria-hidden="true"><svg viewBox="0 0 2400 92" preserveAspectRatio="none"><path id="trace"/></svg></div>
 
 <main>
-  <div class="sheet" id="gate">
-    <div class="eyebrow in"><i></i>For the Y Combinator W27 partners</div>
-    <h1 class="in">Dear YC,<br><em>a doctor made this.</em></h1>
-    <div class="letter in">
-      <p>I'm Piyush, a doctor and co-founder of WearSynapse. Behind this lock is a two-minute film of our product: a doctor talks to a patient in Hindi and English, the note arrives on WhatsApp, and every piece of advice lands on a follow-up list.</p>
-      <p>Before WearSynapse, I led medical AI strategy at Redcliffe Labs. I've spent more than <strong>5,000 hours building with AI</strong>, and it shows here: I made this film myself, <strong>in a terminal</strong>. I described each shot to an AI, it wrote the film as code, and open-source tools rendered it frame by frame. So was this page, and so was the software you'll see in the film.</p>
-    </div>
-    <div class="creds in" aria-label="About the doctor">
-      <div><b>5,000+</b><span>hours building with AI</span></div>
-      <div><b>6+ yrs</b><span>in rural, public and private hospitals</span></div>
-      <div><b>Medical AI</b><span>strategy lead, Redcliffe Labs</span></div>
-    </div>
-    <ul class="made in" aria-label="How it was made">
-      <li><s>video editor</s></li><li><s>designer</s></li><li><s>agency</s></li><li><s>stock footage</s></li>
-      <li>a terminal, AI and open source</li>
-    </ul>
-    <div class="rx in">
-      <div class="rx-head"><span class="rx-sym">℞</span>
-        <div class="rx-line"><b>Watch once.</b> 2 min 12 s, sound on.</div></div>
-      <div class="rx-note">Password is in our application, next to the product link.</div>
-      <form id="f" autocomplete="off">
-        <input id="pw" type="password" placeholder="Password" aria-label="Password" required>
-        <button id="go"><span>Play the film</span></button>
-      </form>
-      <div class="msg" id="msg" role="status"></div>
-    </div>
-    <div class="sign in">
-      <div class="sig">Piyush Malik<small>Co-founder, WearSynapse · with Karthik Nagapuri</small></div>
-      <div class="aside">Unlike my prescriptions, this one you can read.</div>
+  <div class="step show" id="gate">
+    <h1>Hi <em>YC</em>,</h1>
+    <form id="f" autocomplete="off">
+      <input id="pw" type="password" placeholder="Password" aria-label="Password" required>
+      <button id="go">Enter</button>
+    </form>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+
+  <div class="step" id="check" role="group" aria-labelledby="q">
+    <div class="box">
+      <div class="top"><small id="qn">Quick check, 1 of 2</small><b id="q"></b></div>
+      <div class="opts" id="opts"></div>
+      <div class="nope" id="nope" role="status"></div>
+      <div class="fact" id="fact"><p id="factText"></p><button id="next" type="button"></button></div>
     </div>
   </div>
 
-  <div id="check" role="group" aria-labelledby="q">
-    <div class="cap-box">
-      <div class="cap-top"><small id="qn">One more check: are you human?</small><b id="q"></b></div>
-      <div class="cap-body" id="opts"></div>
-      <div class="reply" id="reply" role="status"></div>
-      <div class="cap-foot"><span>Not a robot? Then you'll know this one.</span><span class="dots"><i class="on"></i><i></i></span></div>
-    </div>
-  </div>
-
-  <div id="film">
-    <div class="frame"><video id="v" controls playsinline></video></div>
-    <div class="cap"><em>Talk. The rest happens on its own.</em><span>Made by a doctor, in a terminal · synthetic patients only</span></div>
-  </div>
+  <div class="step" id="film"><video id="v" controls playsinline></video></div>
 </main>
 
-<footer>WearSynapse · Shunayaverse Quantum Labs Pvt. Ltd. · <a href="https://wearsynapse.com">wearsynapse.com</a></footer>
-
 <script>
-// ECG trace: one beat every 150px, drawn twice so the sweep loops seamlessly
+// Heartbeat trace, drawn twice the visible width so the sweep loops seamlessly
 (() => {
   const beat = x => `L${x+40},56 l10,-4 l10,4 l14,0 l5,7 l8,-50 l8,58 l6,-15 l16,0 q14,-12 28,0 L${x+150},56`;
-  let d = 'M0,56';
-  for (let x = 0; x < 2400; x += 150) d += ' ' + beat(x);
+  let d = 'M0,56'; for (let x = 0; x < 2400; x += 150) d += ' ' + beat(x);
   document.getElementById('trace').setAttribute('d', d);
 })();
 
 const $ = id => document.getElementById(id);
+const go = (from, to) => { $(from).classList.remove('show'); $(to).classList.add('show'); };
+const shake = el => { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); };
 
-// Two-question "captcha" shown after the right password, before the film
-const PIYUSH = { who: 'Dr. Piyush', role: 'the doctor' }, KARTHIK = { who: 'Karthik', role: 'the AI builder' };
-const QUESTIONS = [
-  { q: 'Who made this film?', right: PIYUSH, opts: [KARTHIK, PIYUSH],
-    ok: 'Correct. Dr. Piyush made it, in a terminal, with AI.',
-    no: 'Most people guess the builder. It was the doctor, after 5,000+ hours of building with AI.' },
-  { q: 'And the software you’ll see in it?', right: PIYUSH, opts: [KARTHIK, PIYUSH],
-    ok: 'Correct. Karthik builds the pendant; Dr. Piyush built this software with AI.',
-    no: 'The doctor again. Before WearSynapse he led medical AI strategy at Redcliffe Labs.' },
-];
-const tick = '<svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
-function ask(i) {
-  const { q, opts } = QUESTIONS[i];
-  $('q').textContent = q; $('reply').textContent = ''; $('reply').className = 'reply';
-  $('qn').textContent = i ? 'Last one.' : 'One more check: are you human?';
-  document.querySelectorAll('.dots i').forEach((d, n) => d.classList.toggle('on', n <= i));
-  $('opts').innerHTML = '';
-  for (const o of opts) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'opt';
-    b.innerHTML = `<span class="box">${tick}</span><span><span class="who">${o.who}</span><span class="role">${o.role}</span></span>`;
-    b.onclick = () => answer(i, o, b);
-    $('opts').append(b);
-  }
-  const c = $('check'); c.classList.remove('show'); void c.offsetWidth; c.classList.add('show');
-}
-function answer(i, o, b) {
-  const { right, ok, no } = QUESTIONS[i], box = document.querySelector('.cap-box');
-  if (o !== right) {
-    b.classList.add('wrong'); $('reply').className = 'reply err'; $('reply').textContent = no;
-    box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
-    return;
-  }
-  $('opts').querySelectorAll('button').forEach(x => { x.disabled = true; x.classList.remove('wrong'); });
-  b.classList.add('right'); $('reply').className = 'reply ok'; $('reply').textContent = ok;
-  if (i + 1 < QUESTIONS.length) return setTimeout(() => ask(i + 1), 1100);
-  // Touch play() inside the click so Safari later allows playback with sound
-  const v = $('v'); v.play().then(() => v.pause()).catch(() => {});
-  setTimeout(() => { $('check').style.display = 'none'; $('film').classList.add('show'); v.currentTime = 0; v.play().catch(() => {}); }, 900);
-}
-// Start fetching the locked film right away so unlocking feels instant
-// Streamed so we can show progress if they type the password before it finishes
+// Download the locked film in the background, tracking progress
 let pct = 0;
 const locked = (async () => {
   const r = await fetch('demo.bin'); if (!r.ok) throw new Error('fetch');
@@ -287,17 +145,13 @@ locked.catch(() => {});
 $('f').onsubmit = async e => {
   e.preventDefault();
   const btn = $('go'), msg = $('msg');
-  btn.disabled = true; btn.classList.add('busy'); msg.className = 'msg';
-  const show = () => { msg.textContent = pct < 100 ? `Loading the film… ${pct}%` : 'Unlocking…'; };
-  show(); const timer = setInterval(show, 200);
+  btn.disabled = true; msg.className = 'msg';
+  const tick = () => { msg.textContent = pct < 100 ? `Loading… ${pct}%` : ''; };
+  tick(); const timer = setInterval(tick, 200);
   let blob;
   try { blob = new Uint8Array(await locked); }
-  catch {
-    clearInterval(timer); msg.className = 'msg err';
-    msg.textContent = 'The film couldn’t load. Please check your connection and refresh.';
-    btn.disabled = false; btn.classList.remove('busy'); return;
-  }
-  clearInterval(timer); msg.textContent = 'Unlocking…';
+  catch { clearInterval(timer); msg.className = 'msg err'; msg.textContent = 'Couldn’t load. Please refresh.'; btn.disabled = false; return; }
+  clearInterval(timer); msg.textContent = '';
   try {
     const base = await crypto.subtle.importKey('raw', new TextEncoder().encode($('pw').value), 'PBKDF2', false, ['deriveKey']);
     const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: blob.slice(0, 16), iterations: 600000, hash: 'SHA-256' },
@@ -305,14 +159,43 @@ $('f').onsubmit = async e => {
     const mp4 = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: blob.slice(16, 28) }, key, blob.slice(28));
     $('v').src = URL.createObjectURL(new Blob([mp4], { type: 'video/mp4' }));
     document.body.classList.add('unlocked');
-    $('gate').classList.add('leave');
-    setTimeout(() => { $('gate').style.display = 'none'; ask(0); }, 360);
+    go('gate', 'check'); ask(0);
   } catch {
-    msg.className = 'msg err'; msg.textContent = 'That password didn’t match. It’s in our application, next to the product link.';
-    const rx = document.querySelector('.rx'); rx.classList.remove('shake'); void rx.offsetWidth; rx.classList.add('shake');
-    btn.disabled = false; btn.classList.remove('busy'); $('pw').select();
+    msg.className = 'msg err'; msg.textContent = 'Wrong password.';
+    shake($('gate')); btn.disabled = false; $('pw').select();
   }
 };
+
+// Captcha: both answers are the doctor; each reveals one fact
+const QUESTIONS = [
+  { q: 'Who made this film?', fact: 'Dr. Piyush has spent <b>5,000+ hours</b> building with AI.', next: 'Next' },
+  { q: 'Who built the software in it?', fact: 'Dr. Piyush led <b>medical AI strategy</b> at Redcliffe Labs (YC W21).', next: 'Play the film' },
+];
+const OPTIONS = [{ label: 'The medical doctor', right: true }, { label: 'The AI builder', right: false }];
+const svgTick = '<svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+
+function ask(i) {
+  const { q, fact, next } = QUESTIONS[i];
+  $('qn').textContent = `Quick check, ${i + 1} of 2`; $('q').textContent = q;
+  $('nope').textContent = ''; $('fact').classList.remove('show');
+  $('factText').innerHTML = fact; $('next').textContent = next;
+  $('opts').innerHTML = '';
+  for (const o of OPTIONS) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'opt';
+    b.innerHTML = `<span class="tickbox">${svgTick}</span><span>${o.label}</span>`;
+    b.onclick = () => {
+      if (!o.right) { b.classList.add('wrong'); $('nope').textContent = 'Try again.'; shake($('check')); return; }
+      $('opts').querySelectorAll('button').forEach(x => { x.disabled = true; x.classList.remove('wrong'); });
+      b.classList.add('right'); $('nope').textContent = ''; $('fact').classList.add('show');
+    };
+    $('opts').append(b);
+  }
+  $('next').onclick = () => {
+    if (i + 1 < QUESTIONS.length) { $('check').classList.remove('show'); void $('check').offsetWidth; $('check').classList.add('show'); return ask(i + 1); }
+    go('check', 'film'); $('v').play().catch(() => {});   // inside the click, so sound is allowed
+  };
+}
 </script>
 </body>
 </html>
